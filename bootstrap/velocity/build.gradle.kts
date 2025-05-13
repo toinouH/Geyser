@@ -23,6 +23,7 @@ exclude("com.google.*:*")
 
 // Needed because Velocity provides every dependency except netty-resolver-dns
 exclude("io.netty.incubator:.*")
+exclude("io.netty:netty-transport-native-io_uring:*")
 exclude("io.netty:netty-transport-native-epoll:*")
 exclude("io.netty:netty-transport-native-unix-common:*")
 exclude("io.netty:netty-transport-native-kqueue:*")
