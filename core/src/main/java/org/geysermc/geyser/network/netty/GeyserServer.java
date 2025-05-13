@@ -39,9 +39,9 @@ import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import io.netty.channel.uring.IOUring;
-import io.netty.channel.uring.IOUringDatagramChannel;
-import io.netty.channel.uring.IOUringEventLoopGroup;
+import io.netty.channel.uring.IoUring;
+import io.netty.channel.uring.IoUringDatagramChannel;
+import io.netty.channel.uring.IoUringIoHandler;
 import io.netty.util.concurrent.Future;
 import lombok.Getter;
 import net.jodah.expiringmap.ExpirationPolicy;
@@ -435,20 +435,20 @@ public final class GeyserServer {
     }
 
     private static Transport compatibleTransport() {
-        if (isClassAvailable("io.netty.channel.uring.IOUring") && IOUring.isAvailable()
+        if (isClassAvailable("io.netty.channel.uring.IoUring") && IoUring.isAvailable()
                 && Boolean.parseBoolean(System.getProperty("Geyser.io_uring"))) {
-            return new Transport(IOUringDatagramChannel.class, IOUringEventLoopGroup::new);
+            return new Transport(IoUringDatagramChannel.class, IoUringIoHandler::newFactory);
         }
 
         if (isClassAvailable("io.netty.channel.epoll.Epoll") && Epoll.isAvailable()) {
-            return new Transport(EpollDatagramChannel.class, EpollEventLoopGroup::new);
+            return new Transport(EpollDatagramChannel.class, EpollIoHandler::newFactory);
         }
 
         if (isClassAvailable("io.netty.channel.kqueue.KQueue") && KQueue.isAvailable()) {
-            return new Transport(KQueueDatagramChannel.class, KQueueEventLoopGroup::new);
+            return new Transport(KQueueDatagramChannel.class, KQueueIoHandler::newFactory);
         }
 
-        return new Transport(NioDatagramChannel.class, NioEventLoopGroup::new);
+        return new Transport(NioDatagramChannel.class, NioIoHandler::newFactory);
     }
 
     private record Transport(Class<? extends DatagramChannel> datagramChannel, IntFunction<EventLoopGroup> eventLoopGroupFactory) {
